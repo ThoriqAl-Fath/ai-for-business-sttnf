@@ -1,0 +1,163 @@
+{
+  "name": "AI Chatbot Web Agent - FAQ Perpustakaan",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! Selamat datang di Layanan FAQ Perpustakaan STT-NF. Ada yang bisa saya bantu terkait aturan peminjaman atau jam operasional perpustakaan?",
+        "options": {
+          "title": "Asisten Layanan Perpustakaan"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "09728aa7-a956-4935-aa41-1c68f423a4ce",
+      "name": "When chat message received",
+      "webhookId": "da44482e-b001-4738-b00f-bdcb21398859"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten layanan perpustakaan kampus STT-NF yang ramah dan profesional. Tugas utamamu adalah membantu mahasiswa menjawab pertanyaan seputar aturan, jam operasional, denda, dan peminjaman buku berdasarkan data dari perpustakaan. Jawablah dengan ringkas dan jelas. Jangan pernah membuat-buat aturan atau informasi yang tidak ada di dalam sumber datamu."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        288,
+        0
+      ],
+      "id": "feb1961f-14f8-44f7-94fa-48fbea52ac78",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-lite-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        112
+      ],
+      "id": "6f2da115-6bbc-405f-9021-c1741e463319",
+      "name": "Google Gemini Chat Model",
+      "notesInFlow": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zIQmfLvpWBggcu71",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        160
+      ],
+      "id": "c9aa05e3-6767-492a-8aaf-f404f487fc6a",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ycWIqzf5FWF8GtpEwP5GELjaJTt2mATJJDT12a3IBFI",
+          "mode": "list",
+          "cachedResultName": "FAQ Perpustakaan Kampus",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ycWIqzf5FWF8GtpEwP5GELjaJTt2mATJJDT12a3IBFI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ycWIqzf5FWF8GtpEwP5GELjaJTt2mATJJDT12a3IBFI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        112
+      ],
+      "id": "4b6034db-4095-4aba-a440-7064f51b9a18",
+      "name": "FAQ Perpustakaan Kampus",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mk1Tdxw0muxHd3Z8",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ Perpustakaan Kampus": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "73f22134-cc29-4432-9d37-c0c3879da0aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "n9iaD819CYw5rl4v",
+  "tags": []
+}
