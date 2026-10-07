@@ -1,0 +1,163 @@
+{
+  "name": "Chatbot Katalog Kursus IT",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten layanan pelanggan yang ramah dan profesional untuk program pelatihan IT. Tugas utamamu adalah membantu menjawab pertanyaan seputar jenis program (Bootcamp / Skill Up), deskripsi topik, dan biaya/harga kursus berdasarkan data yang kamu miliki. Jawablah dengan ringkas, jelas, dan persuasif. Jangan pernah mengarang harga atau program yang tidak ada di dalam sumber datamu."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        288,
+        0
+      ],
+      "id": "70cc8d4e-13af-42fe-bf6d-58b6c97faf76",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-lite-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        112
+      ],
+      "id": "6d997d5c-a9e2-430e-8102-42228281efaa",
+      "name": "Google Gemini Chat Model",
+      "notesInFlow": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zIQmfLvpWBggcu71",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        160
+      ],
+      "id": "6f4303ef-db5c-45b5-9c01-27f32da78c32",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! Selamat datang di Layanan Informasi Kursus IT. Ada yang ingin ditanyakan seputar program bootcamp, skill up, atau harganya?",
+        "options": {
+          "title": "Asisten Layanan Kursus IT"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8b4054ef-b2c9-4de4-90de-3cb33da2ed52",
+      "name": "Asisten Layanan Kursus IT",
+      "webhookId": "96e83253-6763-43d2-8602-56db90d7fb96"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xlngEPoHYtNyZaT_X2-N0k3beMQsSp3hKiv4GqIcam4",
+          "mode": "list",
+          "cachedResultName": "Katalog Kursus IT STT-NF",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xlngEPoHYtNyZaT_X2-N0k3beMQsSp3hKiv4GqIcam4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xlngEPoHYtNyZaT_X2-N0k3beMQsSp3hKiv4GqIcam4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        112
+      ],
+      "id": "e2d69b77-b65f-4dc9-becb-c5ea45861447",
+      "name": "FAQ  Kursus IT",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mk1Tdxw0muxHd3Z8",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asisten Layanan Kursus IT": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQ  Kursus IT": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e6208fbb-bdfa-4f1b-903c-ad5191bf5e68",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "x6QgMjWbeYxOlKQv",
+  "tags": []
+}
