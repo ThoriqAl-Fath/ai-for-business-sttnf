@@ -1,0 +1,194 @@
+{
+  "name": "Tugas 5 RAG Pipeline - Google Docs",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "3edafa71-439b-4936-b795-4aa4f0fce8d2",
+      "name": "Klik untuk Menjalankan",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -16
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ec76e42b-7fbf-4840-92b1-64123205e315",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        240
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ynlkJ8BejRHBa8Le",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "https://docs.google.com/document/d/10slWRcBI8o391ry3WN_cVx5IeNC8GBor4XTI-7teojA/edit?usp=sharing",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "id": "9b326c6f-d133-413c-90ef-81a6541f9089",
+      "name": "Download PDF dari Google Drive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        -16
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SKXOoEvC0hiMJZUh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents_gdocs",
+          "mode": "list",
+          "cachedResultName": "documents_gdocs"
+        },
+        "options": {
+          "queryName": "match_documents_gdocs"
+        }
+      },
+      "id": "1069cf59-ab32-4abd-89f0-22164e64f3cc",
+      "name": "Simpan ke Supabase Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        -16
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1cIuTDwFw7ruQqlG",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "sumber",
+                "value": "Panduan Penulisan Ilmiah Tugas Akhir Skripsi"
+              }
+            ]
+          }
+        }
+      },
+      "id": "0c7ad074-a505-443e-a5fc-7e0239c9b309",
+      "name": "Default Data Loader1",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "e4c9a292-7beb-460f-ac3a-a6a75e6a7cb1",
+      "name": "Recursive Character Text Splitter1",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        416,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Klik untuk Menjalankan": {
+      "main": [
+        [
+          {
+            "node": "Download PDF dari Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simpan ke Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PDF dari Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Simpan ke Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Simpan ke Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "43bbe182-4131-479e-ab6f-e76c0898f09f",
+  "meta": {
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "yoSLelarjdV8WskJ",
+  "tags": []
+}
