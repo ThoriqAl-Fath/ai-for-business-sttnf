@@ -1,0 +1,193 @@
+{
+  "name": "Pertemuan 4 RAG AI Agent - Chatbot Panduan Skripsi",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! Saya asisten panduan penulisan ilmiah Tugas Akhir/Skripsi. Tanyakan apa saja soal isi bab, format, referensi, abstrak, atau sitasi IEEE.",
+        "options": {
+          "subtitle": "Tanya seputar kriteria penulisan ilmiah Tugas Akhir",
+          "title": "Asisten Panduan Skripsi"
+        }
+      },
+      "id": "4140ba7e-f878-4928-8e39-5eab36e3a750",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -128
+      ],
+      "webhookId": "c3333333-0000-4000-8000-000000000001"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Kamu adalah asisten akademik yang membantu mahasiswa memahami panduan penulisan ilmiah Tugas Akhir (Skripsi) S1.\n\nTUGAS:\nJawab pertanyaan pengguna HANYA berdasarkan isi dokumen Panduan Penulisan Ilmiah Tugas Akhir Skripsi yang tersimpan di knowledge base. Dokumen itu mencakup kriteria Judul, Bab I sampai Bab V, Daftar Referensi, Abstrak, serta format dan gaya penulisan (termasuk sitasi IEEE).\n\nATURAN:\n1. Setiap kali pengguna bertanya soal panduan skripsi, SELALU gunakan tool 'cari_panduan_skripsi' terlebih dahulu sebelum menjawab.\n2. Jawab dalam bahasa Indonesia yang jelas, ringkas, dan mudah dipahami mahasiswa.\n3. Jika informasinya tidak ditemukan di dokumen, katakan terus terang bahwa panduan tidak membahasnya. Jangan mengarang aturan.\n4. Jika pertanyaan tidak berkaitan dengan penulisan tugas akhir, tolak dengan sopan dan arahkan kembali ke topik panduan skripsi.\n5. Sebutkan bagian panduan yang menjadi rujukan (misalnya 'Bab III Metodologi') bila relevan.\n6. Gunakan daftar bernomor atau poin jika jawabannya berupa beberapa kriteria."
+        }
+      },
+      "id": "c5d751e1-6345-4e67-b1df-0abd85aaea59",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-lite-latest",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "a4467587-7456-49f6-a41c-ee0c30cc053f",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -16
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ynlkJ8BejRHBa8Le",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "id": "7916dc78-e63f-4117-a1dd-1acdf5e9cdcd",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Gunakan tool ini untuk mencari isi dokumen Panduan Penulisan Ilmiah Tugas Akhir Skripsi, yaitu kriteria judul, Bab I-V, daftar referensi, abstrak, format dan gaya penulisan, serta standar sitasi IEEE.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 5,
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "id": "67d58519-44f3-4d55-9fa8-b40b17dbc04d",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        -16
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1cIuTDwFw7ruQqlG",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "82326b75-7b05-4284-a86b-a6af1bceefd9",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        192
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ynlkJ8BejRHBa8Le",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ae3600f5-a267-4bda-a97b-de2747f6d55f",
+  "meta": {
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "725KmN0lBe0s9KD9",
+  "tags": []
+}
